@@ -466,9 +466,6 @@
 
           <div class="topright">
             <div class="pill" id="todayPill">今天</div>
-            <button class="iconbtn" id="btnAudio" aria-label="氛圍音開關" title="氛圍音開關">
-              <span id="audioIcon">♪</span>
-            </button>
           </div>
         </header>
 
@@ -556,11 +553,6 @@
             </div>
           </div>
         </section>
-
-        <div class="footer">
-          <span class="tiny">提示：音效/氛圍音會在第一次互動後啟用。</span>
-          <span class="tiny"><a href="#" id="btnAudioHint">如果沒聲音，點我一下</a></span>
-        </div>
       </main>
     </div>
   </div>
@@ -975,7 +967,7 @@
 
     ambientNodes = { out, noise, lfo, shimmer, shimmer2, sGain, nGain };
     ambientOn = true;
-    $("#audioIcon").textContent = "♫";
+    
   }
 
   function stopAmbient(){
@@ -994,7 +986,6 @@
       }catch(e){}
       ambientNodes = null;
       ambientOn = false;
-      $("#audioIcon").textContent = "♪";
     }, 650);
   }
 
@@ -1006,8 +997,7 @@
   }
 
   // UI audio buttons
-  $("#btnAudio").addEventListener("click", ()=> toggleAmbient());
-  $("#btnAudioHint").addEventListener("click", (ev)=>{ ev.preventDefault(); toggleAmbient(); });
+  
 
   // Init
   $("#todayPill").textContent = niceDate();
