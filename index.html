@@ -637,85 +637,177 @@ function getUserId(){
   })();
 
   // Compliment engine
-  const vocab = {
-    vibe: ["乾淨的氣質","溫柔但有底氣的氣場","很耐看的光","不張揚的耀眼","安靜的自信","舒服的存在感"],
-    eyes: ["眼神","笑容","語氣","步伐","表情","說話的節奏"],
-    quality: ["細膩","真誠","有分寸","有想法","有同理心","很可靠","很有品味","很會照顧人但不委屈自己"],
-    effort: ["你願意把事情做好","你在疲憊時仍不敷衍","你把自己慢慢照顧回來","你願意學、願意改、也願意原諒自己","你把小事做得很漂亮"],
-    charm: ["可愛得很有個性","漂亮得不需要大聲","迷人得很有層次","溫柔得很有邊界","閃亮得剛剛好"],
-    metaphor: [
-      "像珍珠的光：不刺眼，但越看越覺得你很迷人。",
-      "像海面上的月光：溫柔、清亮，讓人忍不住想靠近。",
-      "像剛剛好的浪：輕輕推你向前，卻從不讓你窒息。",
-      "像海風的擁抱：看似輕，卻能把煩躁慢慢吹走。",
-      "像一首耐聽的歌：越聽越覺得你很有內容。"
-    ],
-    ending: [
-      "所以今天也請你放心：你很值得被喜歡。",
-      "我希望你把這句話收好，因為它是真的。",
-      "你不用變成誰的版本，你就是很好看的那種人。",
-      "世界很吵，但你是那種能讓人靜下來的存在。",
-      "你已經做得很棒了，而且你還會更好。"
-    ],
-    tag: ["#氣質派讚美","#內在發光","#外在也很可以","#溫柔但堅定","#今天的你很迷人","#你值得被好好看見"]
+  // ====== 大量 + 三風格（無名字版） ======
+function mulberry32(a){
+  return function(){
+    let t = a += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
+}
+function pickR(arr, r){
+  return arr[Math.floor(r() * arr.length)];
+}
 
-  const fullCompliments = [
-    "你有一種很稀有的能力：把複雜的事情用溫柔講清楚，還不會讓人覺得被冒犯。",
-    "你不是那種靠用力討好才可愛的人；你可愛得很自然，像呼吸一樣。",
-    "你最迷人的地方不是外表的某一個點，而是你整個人散發的「好好生活」感。",
-    "你有一種乾淨的漂亮：不需要很多裝飾，就已經很耐看、很舒服。",
-    "你在意細節的方式很漂亮，不是控制，是把每件事都做得有質感。",
-    "你看似溫柔，但你其實很有骨氣；這種反差特別讓人尊敬。",
-    "你讓人覺得安心，不是因為你完美，而是你真誠、也願意好好面對。",
-    "你把界線畫得剛剛好：既不冷漠，也不委屈自己，這真的很成熟。",
-    "你有一種不急著證明什麼的自信，那種從容比任何標籤都更漂亮。",
-    "你不是在「撐住」，你是在「往前走」——而且走得比你以為的更好看。"
-  ];
-
-  const toneLine = {
-    "愛意": [
-      "你不需要用力，就已經很討喜。",
-      "你值得被溫柔對待，而且不需要先表現很好。",
-      "你的可愛很自然，像呼吸一樣。"
+// 三張卡不同語氣詞庫（可再繼續加，越加越不重複）
+const BANK = {
+  "愛意": {
+    openers: [
+      "我想把一句溫柔放到你手心：",
+      "先讓我認真稱讚你一下：",
+      "今天的你值得被好好對待，因為",
+      "我很喜歡你身上那種不費力的可愛：",
+      "偷偷說，"
     ],
-    "光芒": [
-      "你一認真起來，整個人都有光。",
-      "你不是一下就看懂的漂亮，你是越看越驚喜的那種。",
-      "你有把平凡變質感的能力，超難得。"
+    traits: [
+      "溫柔","細膩","體貼","柔軟但有邊界","很會照顧人也懂得照顧自己",
+      "懂得分寸","真誠","可愛得很有個性","心很乾淨","很有同理心",
+      "不急著證明什麼的從容","越相處越耐看的魅力","讓人願意信任的穩"
     ],
-    "安心": [
-      "你讓人放鬆，像終於能把肩膀放下來那樣。",
-      "你說話的溫度剛剛好，能被接住。",
-      "你身上有種「會好起來」的氣息。"
-    ]
-  };
+    focus: [
+      "你的笑容","你的眼神","你的語氣","你對人的方式","你做小事的認真",
+      "你把自己慢慢照顧回來的樣子","你願意理解而不是評判的心"
+    ],
+    metaphors: [
+      "像海面月光一樣柔和又明亮",
+      "像剛剛好的擁抱，讓人放心",
+      "像珍珠的光，不刺眼但很難忘",
+      "像春天的風，輕卻很有力量",
+      "像人魚的歌聲，溫柔得讓人想靠近"
+    ],
+    affirm: [
+      "你不用多做什麼，就已經很討喜。",
+      "你不是靠討好才可愛，你是本來就很可愛。",
+      "你值得被溫柔對待，而且不需要先表現得完美。",
+      "你讓人想好好珍惜，因為你很真。",
+      "你很值得被喜歡——真的。"
+    ],
+    closers: [
+      "今天也請你把自己放在心上。",
+      "你已經很棒了，而且你會越來越好。",
+      "如果你忘了自己的好，我希望你記得這句。",
+      "你值得被世界溫柔地接住。"
+    ],
+    tags: ["#愛意正中","#溫柔但有光","#今天也要被喜歡","#可愛是天生的","#你值得"]
+  },
 
-  const templates = [
-    (r)=>`你今天的${r.eyes}很有故事感，不需要解釋太多，就讓人想靠近一點、再靠近一點。${r.ending}`,
-    (r)=>`你身上那種${r.vibe}很加分：不是高調的漂亮，而是會讓人記住的那種。${r.ending}`,
-    (r)=>`我很喜歡你處理事情的方式——${r.quality}又不失溫度，這真的不是每個人都有。${r.ending}`,
-    (r)=>`你知道嗎？${r.effort}的樣子特別好看，因為那代表你很認真地在愛自己的人生。${r.ending}`,
-    (r)=>`你給人的感覺是${r.charm}，而且越相處越明顯。${r.metaphor} ${r.ending}`,
-    (r)=>`如果把你放進一幅海的畫裡，你一定是那個最耐看的光點：柔和、清亮，卻很有力量。${r.ending}`
-  ];
+  "光芒": {
+    openers: [
+      "我想認真講：",
+      "今天請你收下這句高級稱讚：",
+      "你身上的光很明顯，因為",
+      "我欣賞你的一點是：",
+      "我超想把這句話貼在你額頭上："
+    ],
+    traits: [
+      "有想法","有品味","有野心但不浮躁","自信得剛剛好","很會把事情做漂亮",
+      "清醒","有判斷力","有行動力","目標感很強","不張揚但很有氣場",
+      "越看越驚喜的魅力","能把平凡變質感的能力","很會把自己撐住也撐出高度"
+    ],
+    focus: [
+      "你一認真起來的氣場","你做事的節奏","你整理混亂的能力","你解決問題的方式",
+      "你對美感的掌握","你把界線拿捏得很漂亮","你不卑不亢的態度"
+    ],
+    metaphors: [
+      "像海底的星光一路亮到水面",
+      "像燈塔的光，穩穩指引方向",
+      "像舞台上的聚光燈，但你不用用力就站得住",
+      "像鑽石折射的光，越轉越耀眼",
+      "像童話裡的主角，走到哪裡都自帶氛圍"
+    ],
+    affirm: [
+      "你不是一下就看懂的漂亮，你是越看越驚喜。",
+      "你有那種『不必大聲也會被看見』的強。",
+      "你做得到，因為你一直都在往前。",
+      "你很有份量，不需要用力證明。",
+      "你的存在本身就很加分。"
+    ],
+    closers: [
+      "把這份光留著，今天你會用得到。",
+      "別小看自己，你比你以為的更亮。",
+      "你的路會越走越順，因為你真的有料。",
+      "請你大方一點：你值得被稱讚。"
+    ],
+    tags: ["#光芒萬丈","#不張揚的耀眼","#質感派強者","#你真的很行","#今天請自信"]
+  },
 
-  function buildCompliment(seed, kind){
-    const r = {
-      vibe: pick(vocab.vibe, seed+11),
-      eyes: pick(vocab.eyes, seed+23),
-      quality: pick(vocab.quality, seed+37),
-      effort: pick(vocab.effort, seed+41),
-      charm: pick(vocab.charm, seed+53),
-      metaphor: pick(vocab.metaphor, seed+67),
-      ending: pick(vocab.ending, seed+71)
-    };
-    const useFull = (seed % 10) < 3;
-    const base = useFull ? fullCompliments[seed % fullCompliments.length] : templates[seed % templates.length](r);
-    const tone = pick(toneLine[kind] || toneLine["愛意"], seed+97);
-    return `${tone}\n\n${base}`;
+  "安心": {
+    openers: [
+      "讓我把一句安心送給你：",
+      "如果今天有點累，先聽我說：",
+      "你身上有一種讓人放鬆的力量：",
+      "我很珍惜你的一點是：",
+      "今天想對你說："
+    ],
+    traits: [
+      "沉靜","溫暖","可靠","很會安撫人心","不慌不忙的穩",
+      "把情緒放得很溫柔","願意理解自己也理解別人","很有安全感",
+      "能把日子過成舒服的樣子","心裡有光但不吵","柔和但不委屈"
+    ],
+    focus: [
+      "你說話的溫度","你讓人放下防備的感覺","你處理情緒的成熟",
+      "你願意慢慢來的耐心","你把自己照顧好的能力","你不勉強別人的善意"
+    ],
+    metaphors: [
+      "像海的深呼吸，慢慢把焦躁帶走",
+      "像被子蓋上的那一下，突然就安心了",
+      "像微光的小夜燈，不刺眼但一直在",
+      "像潮汐的節奏，提醒人一切都會過去",
+      "像童話裡的安全屋，讓人願意停靠"
+    ],
+    affirm: [
+      "你讓人覺得可以放心做自己。",
+      "你不是在撐，你是在好好活著——而且活得很漂亮。",
+      "你已經做得很好了，真的。",
+      "你不需要急，日子會跟上你的。",
+      "你值得被好好照顧，也值得被理解。"
+    ],
+    closers: [
+      "今天也請你對自己溫柔一點。",
+      "把肩膀放下來一下，你很值得休息。",
+      "你會越來越穩、越來越好。",
+      "世界很吵，但你可以很安定。"
+    ],
+    tags: ["#安心落地","#被溫柔接住","#今天先不逞強","#你很可靠","#慢慢來也很美"]
   }
-  function pickTag(seed){ return pick(vocab.tag, seed+101); }
+};
+
+const TEMPLATES = [
+  ({focus, trait, metaphor, affirm, close}) =>
+    `${focus}真的很加分——那種${trait}不是裝出來的，${metaphor}。${affirm} ${close}`,
+  ({focus, trait, metaphor, affirm, close}) =>
+    `我很喜歡${focus}帶來的感覺：很${trait}，也很真。你就像${metaphor}。${affirm} ${close}`,
+  ({focus, trait, metaphor, affirm, close}) =>
+    `${focus}讓人不自覺想靠近一點；因為你很${trait}。${metaphor}。${affirm} ${close}`,
+  ({focus, trait, metaphor, affirm, close}) =>
+    `你最迷人的不是某一個點，而是你整個人的節奏：${trait}、舒服、剛剛好。${metaphor}。${affirm} ${close}`,
+  ({focus, trait, metaphor, affirm, close}) =>
+    `如果把你放進一個童話場景裡，你會是那個讓人安心/心動的光源：${focus}很${trait}，${metaphor}。${affirm} ${close}`
+];
+
+function buildCompliment(seed, kind){
+  const r = mulberry32(seed);
+  const bank = BANK[kind] || BANK["愛意"];
+
+  const payload = {
+    focus: pickR(bank.focus, r),
+    trait: pickR(bank.traits, r),
+    metaphor: pickR(bank.metaphors, r),
+    affirm: pickR(bank.affirm, r),
+    close: pickR(bank.closers, r),
+  };
+
+  const opener = pickR(bank.openers, r);
+  const body = pickR(TEMPLATES, r)(payload);
+  return `${opener}\n\n${body}`;
+}
+
+function pickTag(seed, kind){
+  const r = mulberry32(seed ^ 0x9e3779b9);
+  const bank = BANK[kind] || BANK["愛意"];
+  return pickR(bank.tags, r);
+}
 
   const mermaidColors = [
     {name:"珍珠粉", hex:"#ffd6ea"},
@@ -751,7 +843,7 @@ function getUserId(){
     const uid = getUserId();
     const seed = hash32("compliment::" + day + "::" + kind + "::" + uid);
     const text = buildCompliment(seed, kind);
-    const tag = pickTag(seed);
+    const tag = pickTag(seed,kind);
     const payload = { day, kind, seed, text, tag };
     localStorage.setItem(KEY, JSON.stringify(payload));
     return payload;
