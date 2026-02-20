@@ -6,24 +6,19 @@
   <title>每日讚美收穫所</title>
   <style>
     :root{
-      /* Mermaid / Pearl dreamy palette */
       --ink:#1f2430;
       --muted:#4b5563;
 
-      --glass:#ffffff7a;
-      --glass2:#ffffff3f;
       --line:#ffffffa8;
-
       --shadow: 0 22px 60px rgba(10,16,28,.18);
       --shadow2: 0 14px 34px rgba(10,16,28,.14);
       --radius: 22px;
 
-      /* accent gradients */
-      --g1: #ffd6ea; /* pearl pink */
-      --g2: #c7f0ff; /* seafoam blue */
-      --g3: #cdbdff; /* lilac */
-      --g4: #bfffe7; /* mint */
-      --g5: #ffe9c7; /* warm pearl */
+      --g1:#ffd6ea; /* pearl pink */
+      --g2:#c7f0ff; /* sea blue */
+      --g3:#cdbdff; /* lilac */
+      --g4:#bfffe7; /* mint */
+      --g5:#ffe9c7; /* champagne */
     }
 
     *{box-sizing:border-box}
@@ -34,7 +29,6 @@
       color:var(--ink);
       overflow-x:hidden;
 
-      /* Pearl mermaid background */
       background:
         radial-gradient(900px 520px at 12% 8%, rgba(255,214,234,.92) 0%, rgba(255,214,234,0) 60%),
         radial-gradient(820px 520px at 88% 14%, rgba(199,240,255,.92) 0%, rgba(199,240,255,0) 60%),
@@ -43,7 +37,6 @@
         linear-gradient(135deg, #fff2f8 0%, #e9fbff 35%, #f5efff 70%, #fff6ea 100%);
     }
 
-    /* Iridescent sheen layer */
     .sheen{
       position:fixed; inset:-10vh -10vw;
       pointer-events:none;
@@ -66,7 +59,6 @@
       100%{ transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1.05); }
     }
 
-    /* Floating sparkles / bubbles */
     .sparkle{ position:fixed; inset:-20vh -10vw; pointer-events:none; opacity:.95; }
     .dot{
       position:absolute;
@@ -104,8 +96,12 @@
       padding: 22px 16px calc(24px + env(safe-area-inset-bottom));
     }
 
+    /* Wider on desktop */
+    .shell{
+      width:min(980px, 100%);
+    }
+
     .phone{
-      width:min(460px, 100%);
       border-radius: 30px;
       padding: 16px;
       background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.28));
@@ -123,7 +119,6 @@
         radial-gradient(240px 160px at 82% 18%, rgba(199,240,255,.35), transparent 70%),
         radial-gradient(260px 200px at 60% 86%, rgba(205,189,255,.28), transparent 72%);
       pointer-events:none;
-      filter: blur(0.2px);
       opacity:.9;
     }
 
@@ -144,7 +139,6 @@
       align-items:center;
       flex:0 0 auto;
     }
-
     .pill{
       padding: 8px 10px;
       border-radius: 999px;
@@ -154,18 +148,14 @@
       box-shadow: 0 10px 22px rgba(10,16,28,.08);
       white-space:nowrap;
     }
-
     .iconbtn{
-      width: 38px;
-      height: 38px;
+      width: 38px; height: 38px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.85);
       background: linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.55));
       box-shadow: 0 12px 22px rgba(10,16,28,.10);
       cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      display:flex; align-items:center; justify-content:center;
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       transition: transform .08s ease, filter .12s ease;
@@ -184,7 +174,20 @@
       z-index:1;
     }
 
-    /* --- Flip card mini game --- */
+    /* Desktop: 2 columns */
+    .grid{
+      display:block;
+    }
+    @media (min-width: 860px){
+      .grid{
+        display:grid;
+        grid-template-columns: 1.05fr .95fr;
+        gap: 14px;
+        align-items: start;
+      }
+      .card{ margin-top: 14px; }
+    }
+
     .hint{
       margin: 2px 0 12px;
       font-size: 12px;
@@ -203,7 +206,7 @@
       margin-top: 8px;
     }
 
-    .flip{ perspective: 950px; height: 116px; }
+    .flip{ perspective: 950px; height: 126px; }
     .flip button{
       width:100%; height:100%;
       padding:0; border:0;
@@ -235,6 +238,7 @@
       padding: 12px;
       user-select:none;
     }
+
     .front{
       background:
         radial-gradient(140px 90px at 28% 20%, rgba(255,255,255,.95), rgba(255,255,255,0) 62%),
@@ -252,24 +256,7 @@
       opacity:.55;
       pointer-events:none;
     }
-    .front .seal{
-      width: 54px; height:54px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.62));
-      border: 1px solid rgba(255,255,255,.92);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 20px;
-      box-shadow: 0 12px 22px rgba(10,16,28,.08);
-    }
-    .front .txt{
-      margin-top: 10px;
-      font-size: 12px;
-      color: rgba(39,49,73,.80);
-      line-height: 1.2;
-    }
-    .front .wrapfront{
+    .wrapfront{
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -277,39 +264,58 @@
       position:relative;
       z-index:1;
     }
+    .seal{
+      width: 58px; height:58px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.62));
+      border: 1px solid rgba(255,255,255,.92);
+      display:flex; align-items:center; justify-content:center;
+      font-size: 22px;
+      box-shadow: 0 12px 22px rgba(10,16,28,.08);
+    }
+    .txt{
+      margin-top: 2px;
+      font-size: 12px;
+      color: rgba(39,49,73,.82);
+      line-height: 1.2;
+    }
 
+    /* Back side: ONLY icon, no text */
     .back{
       transform: rotateY(180deg);
       background:
-        radial-gradient(160px 100px at 70% 25%, rgba(255,255,255,.95), rgba(255,255,255,0) 64%),
+        radial-gradient(180px 110px at 70% 25%, rgba(255,255,255,.95), rgba(255,255,255,0) 64%),
         linear-gradient(135deg, rgba(255,255,255,.9), rgba(255,255,255,.55));
     }
-
-    .back .pick{ display:flex; flex-direction:column; gap:8px; }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 820;
-      letter-spacing:.3px;
+    .backIcon{
+      width: 74px; height: 74px;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,.92);
       background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.62));
-      border: 1px solid rgba(255,255,255,.9);
-      box-shadow: 0 10px 18px rgba(10,16,28,.08);
-      margin: 0 auto;
+      box-shadow: 0 14px 26px rgba(10,16,28,.10);
+      display:flex; align-items:center; justify-content:center;
+      font-size: 28px;
+      color:#273149;
+      position:relative;
+      overflow:hidden;
     }
-    .badge.m1{ background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,214,234,.55)); }
-    .badge.m2{ background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(199,240,255,.55)); }
-    .badge.m3{ background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(205,189,255,.50)); }
+    .backIcon::after{
+      content:"";
+      position:absolute; inset:-40%;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.55), transparent 58%);
+      transform: rotate(12deg);
+      opacity:.9;
+    }
 
-    .result{
-      margin-top: 14px;
+    .resultCard{
+      padding: 14px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,.88);
+      background: linear-gradient(180deg, rgba(255,255,255,.66), rgba(255,255,255,.34));
+      box-shadow: 0 14px 34px rgba(10,16,28,.10);
       display:none;
     }
-    .result.show{ display:block; }
+    .resultCard.show{ display:block; }
 
     .compliment{
       margin: 0;
@@ -321,15 +327,6 @@
       word-break: break-word;
     }
 
-    .meta{
-      margin-top: 10px;
-      display:flex; gap:10px;
-      align-items:center; justify-content:space-between;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    /* Lucky color box */
     .ribbon{
       margin-top: 12px;
       padding: 12px 14px;
@@ -365,9 +362,16 @@
       opacity:.9;
     }
 
-    /* Bottom controls */
+    .meta{
+      margin-top: 10px;
+      display:flex; gap:10px;
+      align-items:center; justify-content:space-between;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
     .actions{
-      margin-top: 14px;
+      margin-top: 12px;
       display:flex;
       gap:10px;
       flex-wrap:wrap;
@@ -386,12 +390,11 @@
       border: 1px solid rgba(255,255,255,.92);
       box-shadow: 0 14px 30px rgba(10,16,28,.12);
       transition: transform .08s ease, filter .12s ease;
-      flex: 1 1 180px;
+      flex: 1 1 160px;
       min-width: 150px;
       touch-action: manipulation;
     }
     .btn:active{ transform: translateY(1px) scale(.99); filter:saturate(1.06); }
-    .btn.ghost{ background: linear-gradient(135deg, rgba(255,255,255,.70), rgba(255,255,255,.35)); }
     .btn:disabled{ opacity:.55; cursor:not-allowed; }
 
     .footer{
@@ -406,7 +409,6 @@
     .tiny{ opacity:.9; }
     a{ color: inherit; text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,.85); }
 
-    /* heart particles */
     .heart{
       position:fixed;
       width: 12px; height: 12px;
@@ -435,7 +437,7 @@
 
     @media (max-width: 360px){
       .deck{ gap:10px; }
-      .flip{ height: 108px; }
+      .flip{ height: 114px; }
       .btn{ min-width: 140px; }
     }
   </style>
@@ -445,127 +447,114 @@
   <div class="sparkle" id="sparkle"></div>
 
   <div class="wrap">
-    <main class="phone" role="main">
-      <header>
-        <div class="title">
-          <h1>每日讚美收穫所</h1>
-          <p class="sub">翻一張浪漫卡，讚美與幸運色會立刻出現 ✧</p>
-        </div>
-
-        <div class="topright">
-          <div class="pill" id="todayPill">今天</div>
-          <button class="iconbtn" id="btnMusic" aria-label="音樂開關" title="音樂開關">
-            <span id="musicIcon">♪</span>
-          </button>
-        </div>
-      </header>
-
-      <section class="card" aria-live="polite">
-        <div class="hint">
-          <span>請先翻一張卡：<b>愛意 / 光芒 / 安心</b></span>
-          <span id="stateHint">尚未翻牌</span>
-        </div>
-
-        <div class="deck" id="deck">
-          <div class="flip" data-kind="愛意">
-            <button type="button" aria-label="翻牌：愛意">
-              <div class="flip-inner">
-                <div class="face front">
-                  <div class="wrapfront">
-                    <div class="seal">♡</div>
-                    <div class="txt">點我翻開<br/>愛意卡</div>
-                  </div>
-                </div>
-                <div class="face back">
-                  <div class="pick">
-                    <div class="badge m1">你翻到：愛意</div>
-                    <div style="font-size:12px;color:rgba(39,49,73,.75);line-height:1.25;">
-                      今天的讚美偏「溫柔喜歡你」的語氣。
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </button>
+    <div class="shell">
+      <main class="phone" role="main">
+        <header>
+          <div class="title">
+            <h1>每日讚美收穫所</h1>
+            <p class="sub">翻一張浪漫卡，讚美與幸運色會立刻出現 ✧</p>
           </div>
 
-          <div class="flip" data-kind="光芒">
-            <button type="button" aria-label="翻牌：光芒">
-              <div class="flip-inner">
-                <div class="face front">
-                  <div class="wrapfront">
-                    <div class="seal">✦</div>
-                    <div class="txt">點我翻開<br/>光芒卡</div>
-                  </div>
-                </div>
-                <div class="face back">
-                  <div class="pick">
-                    <div class="badge m2">你翻到：光芒</div>
-                    <div style="font-size:12px;color:rgba(39,49,73,.75);line-height:1.25;">
-                      今天的讚美偏「你很有魅力」的語氣。
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div class="topright">
+            <div class="pill" id="todayPill">今天</div>
+            <button class="iconbtn" id="btnAudio" aria-label="氛圍音開關" title="氛圍音開關">
+              <span id="audioIcon">♪</span>
             </button>
           </div>
+        </header>
 
-          <div class="flip" data-kind="安心">
-            <button type="button" aria-label="翻牌：安心">
-              <div class="flip-inner">
-                <div class="face front">
-                  <div class="wrapfront">
-                    <div class="seal">☁︎</div>
-                    <div class="txt">點我翻開<br/>安心卡</div>
-                  </div>
-                </div>
-                <div class="face back">
-                  <div class="pick">
-                    <div class="badge m3">你翻到：安心</div>
-                    <div style="font-size:12px;color:rgba(39,49,73,.75);line-height:1.25;">
-                      今天的讚美偏「被好好接住」的語氣。
+        <section class="card" aria-live="polite">
+          <div class="grid">
+            <!-- LEFT: cards -->
+            <div>
+              <div class="hint">
+                <span>請翻一張卡：<b>愛意 / 光芒 / 安心</b></span>
+                <span id="stateHint">尚未翻牌</span>
+              </div>
+
+              <div class="deck">
+                <div class="flip" data-kind="愛意">
+                  <button type="button" aria-label="翻牌：愛意">
+                    <div class="flip-inner">
+                      <div class="face front">
+                        <div class="wrapfront">
+                          <div class="seal">♡</div>
+                          <div class="txt">點我翻開<br/>愛意卡</div>
+                        </div>
+                      </div>
+                      <div class="face back">
+                        <div class="backIcon">♡</div>
+                      </div>
                     </div>
-                  </div>
+                  </button>
+                </div>
+
+                <div class="flip" data-kind="光芒">
+                  <button type="button" aria-label="翻牌：光芒">
+                    <div class="flip-inner">
+                      <div class="face front">
+                        <div class="wrapfront">
+                          <div class="seal">✦</div>
+                          <div class="txt">點我翻開<br/>光芒卡</div>
+                        </div>
+                      </div>
+                      <div class="face back">
+                        <div class="backIcon">✦</div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
+                <div class="flip" data-kind="安心">
+                  <button type="button" aria-label="翻牌：安心">
+                    <div class="flip-inner">
+                      <div class="face front">
+                        <div class="wrapfront">
+                          <div class="seal">☁︎</div>
+                          <div class="txt">點我翻開<br/>安心卡</div>
+                        </div>
+                      </div>
+                      <div class="face back">
+                        <div class="backIcon">☁︎</div>
+                      </div>
+                    </div>
+                  </button>
                 </div>
               </div>
-            </button>
-          </div>
-        </div>
-
-        <!-- Result shows immediately after flip -->
-        <div class="result" id="result">
-          <p class="compliment" id="compliment">（翻牌後會出現。）</p>
-
-          <div class="ribbon" id="luckyBox">
-            <div class="luck">
-              <div class="label">今日浪漫幸運色</div>
-              <div class="value" id="luckyText">—</div>
             </div>
-            <div class="swatch" id="swatch"></div>
-          </div>
 
-          <div class="meta">
-            <span id="tag">#今天的你很迷人</span>
-            <span id="streak">連續收穫：0 天</span>
-          </div>
+            <!-- RIGHT: result -->
+            <div class="resultCard" id="resultCard">
+              <p class="compliment" id="compliment">（翻牌後出現。）</p>
 
-          <div class="actions">
-            <button class="btn ghost" id="btnCopy" disabled>把這句收藏到剪貼簿</button>
-            <button class="btn ghost" id="btnReset">重置今天</button>
+              <div class="ribbon">
+                <div class="luck">
+                  <div class="label">今日浪漫幸運色</div>
+                  <div class="value" id="luckyText">—</div>
+                </div>
+                <div class="swatch" id="swatch"></div>
+              </div>
+
+              <div class="meta">
+                <span id="tag">#等你翻牌</span>
+                <span id="streak">連續收穫：0 天</span>
+              </div>
+
+              <div class="actions">
+                <button class="btn" id="btnCopy" disabled>複製（含幸運色）</button>
+                <button class="btn" id="btnReset">重置今天</button>
+              </div>
+            </div>
           </div>
+        </section>
+
+        <div class="footer">
+          <span class="tiny">提示：音效/氛圍音會在第一次互動後啟用。</span>
+          <span class="tiny"><a href="#" id="btnAudioHint">如果沒聲音，點我一下</a></span>
         </div>
-      </section>
-
-      <div class="footer">
-        <span class="tiny">提示：音樂會在「第一次互動（翻牌/按音樂）」後開始播放。</span>
-        <span class="tiny"><a href="#" id="btnMusicHint">音樂如果沒響，點我一下</a></span>
-      </div>
-    </main>
+      </main>
+    </div>
   </div>
-
-  <!-- 音樂：建議你把 music.mp3 放在同一個 repo 根目錄（跟 index.html 同層） -->
-  <audio id="bgm" preload="auto" loop>
-    <source src="music.mp3" type="audio/mpeg" />
-  </audio>
 
 <script>
   const $ = (s) => document.querySelector(s);
@@ -581,7 +570,6 @@
     const d = new Date();
     return d.toLocaleDateString('zh-TW', { month:'long', day:'numeric', weekday:'short' });
   };
-
   const hash32 = (str) => {
     let h = 2166136261;
     for (let i=0;i<str.length;i++){
@@ -592,12 +580,11 @@
   };
   const pick = (arr, seed) => arr[ seed % arr.length ];
 
-  // Sparkles + bubbles
+  // Particles
   (function buildParticles(){
     const root = document.getElementById('sparkle');
     const w = window.innerWidth, h = window.innerHeight;
 
-    // sparkles
     for(let i=0;i<22;i++){
       const dot = document.createElement('div');
       dot.className = 'dot';
@@ -617,7 +604,6 @@
       root.appendChild(dot);
     }
 
-    // bubbles
     for(let i=0;i<18;i++){
       const b = document.createElement('div');
       b.className = 'bubble';
@@ -676,19 +662,19 @@
 
   const toneLine = {
     "愛意": [
-      "有人喜歡你不是因為你做了什麼，而是因為你本來就很討喜。",
-      "你不必用力證明，你的可愛本來就站得住腳。",
-      "你值得被溫柔地對待，而且是「不用先表現很好」也值得。"
+      "你不需要用力，就已經很討喜。",
+      "你值得被溫柔對待，而且不需要先表現很好。",
+      "你的可愛很自然，像呼吸一樣。"
     ],
     "光芒": [
-      "你不是那種一下就看懂的漂亮，你是越看越驚喜的那種。",
-      "你有一種把平凡變得很有質感的能力，這很難得。",
-      "你一認真起來，整個人都有光，真的。"
+      "你一認真起來，整個人都有光。",
+      "你不是一下就看懂的漂亮，你是越看越驚喜的那種。",
+      "你有把平凡變質感的能力，超難得。"
     ],
     "安心": [
-      "你讓人感到放鬆，像終於可以把肩膀放下來那樣。",
-      "你說話的溫度很剛好：不冰，也不燙，剛好能被接住。",
-      "你身上有種「會好起來」的氣息，靠近就覺得踏實。"
+      "你讓人放鬆，像終於能把肩膀放下來那樣。",
+      "你說話的溫度剛剛好，能被接住。",
+      "你身上有種「會好起來」的氣息。"
     ]
   };
 
@@ -718,7 +704,6 @@
   }
   function pickTag(seed){ return pick(vocab.tag, seed+101); }
 
-  // Lucky colors (Mermaid-ish + Morandi softness)
   const mermaidColors = [
     {name:"珍珠粉", hex:"#ffd6ea"},
     {name:"海月藍", hex:"#c7f0ff"},
@@ -731,16 +716,15 @@
     {name:"柔光青藍", hex:"#b8e6ff"},
     {name:"貝殼米", hex:"#f7e7d3"}
   ];
-
   function getLuckyColor(){
     const day = todayISO();
     const seed = hash32("lucky::" + day);
     return mermaidColors[seed % mermaidColors.length];
   }
 
-  // Daily lock storage
-  const KEY = "daily-compliment-mermaid-v1";
-  const PICK = "daily-pick-kind-v2";
+  // Daily lock
+  const KEY = "daily-compliment-mermaid-v2";
+  const PICK = "daily-pick-kind-v3";
   const STREAK = "daily-streak-v1";
   const LASTDAY = "daily-lastday-v1";
 
@@ -795,38 +779,226 @@
     }
   }
 
-  // Music controls (autoplay only after interaction)
-  const bgm = $("#bgm");
-  const btnMusic = $("#btnMusic");
-  const musicIcon = $("#musicIcon");
-  let musicOn = false;
+  // ===== WebAudio: Mermaid vibe =====
+  let audioCtx = null;
+  let ambientOn = false;
+  let ambientNodes = null;
 
-  async function tryPlayMusic(){
-    try{
-      // set a gentle volume
-      bgm.volume = 0.35;
-      await bgm.play();
-      musicOn = true;
-      musicIcon.textContent = "♫";
-    }catch(e){
-      // Browser blocked autoplay until more explicit user action; keep off.
-      musicOn = false;
-      musicIcon.textContent = "♪";
+  function ensureAudio(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  function now(){ return audioCtx.currentTime; }
+
+  function makeReverbLikeGain(){
+    // lightweight "space" by using a feedback delay + filter (cheap reverb-ish)
+    const input = audioCtx.createGain();
+    const delay = audioCtx.createDelay(1.2);
+    delay.delayTime.value = 0.22;
+    const feedback = audioCtx.createGain();
+    feedback.gain.value = 0.35;
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 1800;
+
+    input.connect(delay);
+    delay.connect(lp);
+    lp.connect(feedback);
+    feedback.connect(delay);
+
+    const wet = audioCtx.createGain();
+    wet.gain.value = 0.35;
+    lp.connect(wet);
+
+    const out = audioCtx.createGain();
+    out.gain.value = 0.9;
+
+    input.connect(out); // dry
+    wet.connect(out);   // wet
+    return { input, out };
+  }
+
+  function playChime(type="pearl"){
+    ensureAudio();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+
+    const t0 = now();
+    const master = audioCtx.createGain();
+    master.gain.setValueAtTime(0.0001, t0);
+    master.gain.exponentialRampToValueAtTime(0.35, t0 + 0.02);
+    master.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.4);
+
+    const rev = makeReverbLikeGain();
+    master.connect(rev.input);
+    rev.out.connect(audioCtx.destination);
+
+    // Crystal bell partials
+    const freqs =
+      type === "love"  ? [523.25, 659.25, 783.99] :
+      type === "shine" ? [587.33, 740.00, 880.00] :
+      type === "calm"  ? [493.88, 622.25, 740.00] :
+                         [554.37, 698.46, 830.61];
+
+    freqs.forEach((f, i)=>{
+      const osc = audioCtx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(f, t0);
+
+      const g = audioCtx.createGain();
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.22/(i+1), t0 + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.2);
+
+      osc.connect(g);
+      g.connect(master);
+
+      osc.start(t0 + i*0.012);
+      osc.stop(t0 + 1.25);
+    });
+
+    // Bubble pops (short filtered noise)
+    for(let i=0;i<4;i++){
+      const tt = t0 + 0.06 + i*0.09;
+      const bufferSize = Math.floor(audioCtx.sampleRate * 0.08);
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let j=0;j<bufferSize;j++){
+        data[j] = (Math.random()*2 - 1) * (1 - j/bufferSize);
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      const bp = audioCtx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.setValueAtTime(900 + Math.random()*700, tt);
+      bp.Q.value = 6;
+
+      const ng = audioCtx.createGain();
+      ng.gain.setValueAtTime(0.0001, tt);
+      ng.gain.exponentialRampToValueAtTime(0.10, tt + 0.01);
+      ng.gain.exponentialRampToValueAtTime(0.0001, tt + 0.09);
+
+      noise.connect(bp);
+      bp.connect(ng);
+      ng.connect(master);
+
+      noise.start(tt);
+      noise.stop(tt + 0.08);
     }
   }
-  function pauseMusic(){
-    bgm.pause();
-    musicOn = false;
-    musicIcon.textContent = "♪";
+
+  function startAmbient(){
+    ensureAudio();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+    if(ambientOn) return;
+
+    // Soft ocean pad: filtered noise + slow LFO + subtle shimmer tones
+    const out = audioCtx.createGain();
+    out.gain.value = 0.12;
+
+    const rev = makeReverbLikeGain();
+    out.connect(rev.input);
+    rev.out.connect(audioCtx.destination);
+
+    // Noise
+    const bufferSize = audioCtx.sampleRate * 2;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++){
+      data[i] = (Math.random()*2 - 1) * 0.25;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    noise.loop = true;
+
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 450; // ocean hush
+
+    const hp = audioCtx.createBiquadFilter();
+    hp.type = "highpass";
+    hp.frequency.value = 60;
+
+    const nGain = audioCtx.createGain();
+    nGain.gain.value = 0.55;
+
+    noise.connect(lp);
+    lp.connect(hp);
+    hp.connect(nGain);
+    nGain.connect(out);
+
+    // Slow LFO to "breathe"
+    const lfo = audioCtx.createOscillator();
+    lfo.type = "sine";
+    lfo.frequency.value = 0.06;
+
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 0.18;
+    lfo.connect(lfoGain);
+    lfoGain.connect(nGain.gain);
+
+    // Shimmer (very soft)
+    const shimmer = audioCtx.createOscillator();
+    shimmer.type = "sine";
+    shimmer.frequency.value = 220;
+
+    const shimmer2 = audioCtx.createOscillator();
+    shimmer2.type = "sine";
+    shimmer2.frequency.value = 277.18;
+
+    const sGain = audioCtx.createGain();
+    sGain.gain.value = 0.0001;
+
+    const t0 = now();
+    // fade in
+    sGain.gain.setValueAtTime(0.0001, t0);
+    sGain.gain.exponentialRampToValueAtTime(0.045, t0 + 1.2);
+
+    shimmer.connect(sGain);
+    shimmer2.connect(sGain);
+    sGain.connect(out);
+
+    noise.start();
+    lfo.start();
+    shimmer.start();
+    shimmer2.start();
+
+    ambientNodes = { out, noise, lfo, shimmer, shimmer2, sGain, nGain };
+    ambientOn = true;
+    $("#audioIcon").textContent = "♫";
   }
-  btnMusic.addEventListener("click", async ()=>{
-    if(musicOn) pauseMusic();
-    else await tryPlayMusic();
-  });
-  $("#btnMusicHint").addEventListener("click", async (ev)=>{
-    ev.preventDefault();
-    await tryPlayMusic();
-  });
+
+  function stopAmbient(){
+    if(!audioCtx || !ambientOn || !ambientNodes) return;
+
+    const t0 = now();
+    // graceful fade
+    ambientNodes.out.gain.setTargetAtTime(0.0001, t0, 0.12);
+
+    setTimeout(()=>{
+      try{
+        ambientNodes.noise.stop();
+        ambientNodes.lfo.stop();
+        ambientNodes.shimmer.stop();
+        ambientNodes.shimmer2.stop();
+      }catch(e){}
+      ambientNodes = null;
+      ambientOn = false;
+      $("#audioIcon").textContent = "♪";
+    }, 650);
+  }
+
+  function toggleAmbient(){
+    ensureAudio();
+    if(audioCtx.state === "suspended") audioCtx.resume();
+    if(ambientOn) stopAmbient();
+    else startAmbient();
+  }
+
+  // UI audio buttons
+  $("#btnAudio").addEventListener("click", ()=> toggleAmbient());
+  $("#btnAudioHint").addEventListener("click", (ev)=>{ ev.preventDefault(); toggleAmbient(); });
 
   // Init
   $("#todayPill").textContent = niceDate();
@@ -844,18 +1016,21 @@
     $("#luckyText").textContent = `${lucky.name}（${lucky.hex}）`;
     $("#swatch").style.background = lucky.hex;
 
-    $("#result").classList.add("show");
+    $("#resultCard").classList.add("show");
     $("#btnCopy").disabled = false;
 
     $("#stateHint").textContent = `你翻到「${kind}」— 已收穫今天的讚美 ✧`;
     updateStreak();
     burstHearts(clickX || (window.innerWidth/2), clickY || (window.innerHeight*0.48));
 
-    // Start music on first interaction (best practice for mobile)
-    if(!musicOn) tryPlayMusic();
+    // sound
+    const tone = (kind === "愛意") ? "love" : (kind === "光芒") ? "shine" : "calm";
+    playChime(tone);
+    // optional: start ambient gently after first interaction
+    if(!ambientOn) startAmbient();
   }
 
-  // Flip logic (first flip triggers everything immediately)
+  // Flip logic
   document.querySelectorAll(".flip").forEach((el)=>{
     el.addEventListener("click", (ev)=>{
       if(hasFlipped) return;
@@ -880,6 +1055,7 @@
     try{
       await navigator.clipboard.writeText(text);
       $("#tag").textContent = "#已複製（含幸運色）";
+      playChime("pearl");
     }catch(e){
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -888,6 +1064,7 @@
       document.execCommand('copy');
       ta.remove();
       $("#tag").textContent = "#已複製（含幸運色）";
+      playChime("pearl");
     }
   });
 
@@ -898,12 +1075,13 @@
     hasFlipped = false;
 
     $("#stateHint").textContent = "尚未翻牌";
-    $("#result").classList.remove("show");
+    $("#resultCard").classList.remove("show");
     $("#btnCopy").disabled = true;
     $("#tag").textContent = "#等你翻牌";
-    $("#compliment").textContent = "（翻牌後會出現。）";
+    $("#compliment").textContent = "（翻牌後出現。）";
 
     document.querySelectorAll(".flip").forEach(el => el.classList.remove("is-flipped"));
+    playChime("pearl");
   });
 </script>
 </body>
