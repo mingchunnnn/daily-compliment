@@ -559,6 +559,17 @@
   </div>
 
 <script>
+  // 每個裝置/瀏覽器專屬 ID：第一次進來生成，之後固定存在 localStorage
+const USER_ID_KEY = "daily-user-id-v1";
+function getUserId(){
+  let id = localStorage.getItem(USER_ID_KEY);
+  if(!id){
+    // 隨機、夠用且不會撞的 ID
+    id = (crypto?.randomUUID?.() || (Date.now().toString(36) + Math.random().toString(36).slice(2)));
+    localStorage.setItem(USER_ID_KEY, id);
+  }
+  return id;
+}
   const $ = (s) => document.querySelector(s);
 
   const todayISO = () => {
@@ -720,7 +731,8 @@
   ];
   function getLuckyColor(){
     const day = todayISO();
-    const seed = hash32("lucky::" + day);
+    const uid = getUserId();
+    const seed = hash32("lucky::" + day + "::" + uid);
     return mermaidColors[seed % mermaidColors.length];
   }
 
@@ -736,7 +748,8 @@
     if(saved && saved.day === day && saved.kind === kind && saved.text){
       return saved;
     }
-    const seed = hash32("compliment::" + day + "::" + kind);
+    const uid = getUserId();
+    const seed = hash32("compliment::" + day + "::" + kind + "::" + uid);
     const text = buildCompliment(seed, kind);
     const tag = pickTag(seed);
     const payload = { day, kind, seed, text, tag };
