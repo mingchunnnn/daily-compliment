@@ -539,6 +539,41 @@
   position: relative;
   z-index: 1;
 }
+    .card{
+  padding: 18px;              
+}
+@media (min-width: 860px){
+  .phone{ padding: 18px; }
+  .card{ padding: 20px; }
+}
+    .bottom-mantra{
+  position: fixed;
+  left: 50%;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none; /* 不擋你點卡片 */
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.55);
+  background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,.14));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 16px 40px rgba(10,16,28,.16);
+  max-width: min(92vw, 720px);
+  text-align: center;
+}
+.mantra-text{
+  font-size: 12px;
+  letter-spacing: .6px;
+  color: rgba(33,40,58,.72); /* 半透明字色 */
+  text-shadow: 0 8px 20px rgba(10,16,28,.10);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (min-width: 860px){
+  .mantra-text{ font-size: 13px; }
+}
   </style>
 </head>
 <body>
@@ -655,7 +690,9 @@
       </main>
     </div>
   </div>
-
+<div class="bottom-mantra" id="bottomMantra" aria-live="polite">
+  <span class="mantra-text">你值得被溫柔對待，也值得被真心喜歡。</span>
+</div>
 <script>
   // 每個裝置/瀏覽器專屬 ID：第一次進來生成，之後固定存在 localStorage
 const USER_ID_KEY = "daily-user-id-v1";
