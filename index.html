@@ -889,191 +889,70 @@
     }
   }
 
-  function startAmbient(){
+ function startAmbient(){
   ensureAudio();
   if(audioCtx.state === "suspended") audioCtx.resume();
   if(ambientOn) return;
 
   const t0 = now();
 
-  // Master out
-  const out = audioCtx.createGain();
-  out.gain.setValueAtTime(0.0001, t0);
-  out.gain.exponentialRampToValueAtTime(0.18, t0 + 1.0); // 背景音量（想更大：0.22～0.28）
+  const master = audioCtx.createGain();
+  master.gain.setValueAtTime(0.0001, t0);
+  master.gain.exponentialRampToValueAtTime(0.22, t0 + 1.2);
+  master.connect(audioCtx.destination);
 
-  // Space (your lightweight reverb-ish)
-  const rev = makeReverbLikeGain();
-  out.connect(rev.input);
-  rev.out.connect(audioCtx.destination);
+  // 小顫音（讓它更日系）
+  const vibrato = audioCtx.createOscillator();
+  vibrato.frequency.value = 5.5; // 顫音速度
+  const vibratoGain = audioCtx.createGain();
+  vibratoGain.gain.value = 8; // 顫音幅度
+  vibrato.connect(vibratoGain);
+  vibrato.start();
 
-  // Soft low pad chord (fairytale mermaid)
-  const pad = audioCtx.createGain();
-  pad.gain.value = 0.55;
-  pad.connect(out);
-
-  const lp = audioCtx.createBiquadFilter();
-  lp.type = "lowpass";
-  lp.frequency.value = 1800;
-  pad.connect(lp);
-  lp.connect(out);
-
-  // A tiny shimmer bus
-  const shimmerBus = audioCtx.createGain();
-  shimmerBus.gain.value = 0.20;
-  shimmerBus.connect(out);
-
-  // Helpers
   const midiToHz = (m) => 440 * Math.pow(2, (m - 69)/12);
 
-  // Mermaid-style chord progression (C -> Am -> F -> G) in a dreamy register
-  // Notes are MIDI numbers
-  const prog = [
-    { name:"C",  chord:[60,64,67], bass:48 }, // C E G + low C
-    { name:"Am", chord:[57,60,64], bass:45 }, // A C E + low A
-    { name:"F",  chord:[53,57,60], bass:41 }, // F A C + low F
-    { name:"G",  chord:[55,59,62], bass:43 }, // G B D + low G
-  ];
-  const stepDur = 3.2; // 每個和弦持續秒數（想更慢：3.8～4.5）
-  const base = t0 + 0.05;
-
-  // Create sustained pad oscillators (triangle/sine blend)
-  const padOscs = [];
-  const padGains = [];
-
-  function makePadVoice(freq){
-    const o1 = audioCtx.createOscillator();
-    o1.type = "triangle";
-    o1.frequency.value = freq;
-
-    const o2 = audioCtx.createOscillator();
-    o2.type = "sine";
-    o2.frequency.value = freq * 2;
-
-    const g = audioCtx.createGain();
-    g.gain.value = 0.0001;
-
-    // gentle chorus-like detune
-    o1.detune.value = (Math.random()*8 - 4);
-    o2.detune.value = (Math.random()*10 - 5);
-
-    o1.connect(g);
-    o2.connect(g);
-    g.connect(pad);
-
-    o1.start();
-    o2.start();
-
-    padOscs.push(o1, o2);
-    padGains.push(g);
-    return g;
-  }
-
-  // We keep 6 voices: 3 chord + 1 bass + 2 octave shimmer tones
-  // Initialize with first chord
-  const voices = [];
-  const first = prog[0];
-  first.chord.forEach((m)=> voices.push(makePadVoice(midiToHz(m))));
-  voices.push(makePadVoice(midiToHz(first.bass)));
-  voices.push(makePadVoice(midiToHz(first.chord[0]+12)));
-  voices.push(makePadVoice(midiToHz(first.chord[2]+12)));
-
-  function setPadChord(atTime, chordObj){
-    // target freqs for 6 voices
-    const targets = [
-      midiToHz(chordObj.chord[0]),
-      midiToHz(chordObj.chord[1]),
-      midiToHz(chordObj.chord[2]),
-      midiToHz(chordObj.bass),
-      midiToHz(chordObj.chord[0]+12),
-      midiToHz(chordObj.chord[2]+12),
-    ];
-    // smooth frequency glide + envelope swell
-    voices.forEach((g, i)=>{
-      const f = targets[i];
-      // change osc frequency by touching underlying oscillators in padOscs:
-      // each voice uses 2 oscillators (triangle + sine), stored sequentially
-      const tri = padOscs[i*2];
-      const sin = padOscs[i*2+1];
-      tri.frequency.setTargetAtTime(f, atTime, 0.06);
-      sin.frequency.setTargetAtTime(f*2, atTime, 0.06);
-
-      // small swell each chord
-      g.gain.cancelScheduledValues(atTime);
-      g.gain.setValueAtTime(g.gain.value, atTime);
-      g.gain.setTargetAtTime(0.06, atTime, 0.08);
-      g.gain.setTargetAtTime(0.03, atTime + 0.7, 0.25);
-    });
-  }
-
-  // Music-box melody (pentatonic-ish / fairy tale)
-  function pluckNote(freq, atTime, dur=0.28){
-    const o = audioCtx.createOscillator();
-    o.type = "sine";
-    o.frequency.setValueAtTime(freq, atTime);
-
-    const g = audioCtx.createGain();
-    g.gain.setValueAtTime(0.0001, atTime);
-    g.gain.exponentialRampToValueAtTime(0.055, atTime + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, atTime + dur);
-
-    const hp = audioCtx.createBiquadFilter();
-    hp.type = "highpass";
-    hp.frequency.value = 250;
-
-    const bp = audioCtx.createBiquadFilter();
-    bp.type = "bandpass";
-    bp.frequency.value = 1200;
-    bp.Q.value = 7;
-
-    o.connect(bp);
-    bp.connect(hp);
-    hp.connect(g);
-    g.connect(shimmerBus);
-
-    o.start(atTime);
-    o.stop(atTime + dur + 0.02);
-  }
-
-  // A simple repeating 8-note pattern per chord
-  // using scale degrees that feel "mermaid /童話"
-  const melodySteps = [
-    0, 2, 4, 7, 4, 2, 0, 2
+  // 日系夢幻旋律（C大調偏少女動畫）
+  const melody = [
+    72, 74, 76, 79,
+    76, 74, 72, 74,
+    76, 79, 81, 79,
+    76, 74, 72
   ];
 
-  function chordRootMidi(ch){ // pick a root-ish note from chord
-    // for C:60, Am:57, F:53, G:55
-    return ch.chord[0];
+  const noteDur = 0.42;
+  const gap = 0.05;
+
+  function playNote(midi, atTime){
+    const osc = audioCtx.createOscillator();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(midiToHz(midi), atTime);
+
+    // 加顫音
+    vibratoGain.connect(osc.frequency);
+
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.0001, atTime);
+    gain.gain.exponentialRampToValueAtTime(0.08, atTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, atTime + noteDur);
+
+    osc.connect(gain);
+    gain.connect(master);
+
+    osc.start(atTime);
+    osc.stop(atTime + noteDur + 0.02);
   }
 
-  // Schedule for ~2 minutes then it will naturally continue by re-scheduling on each start (we loop by restarting ambient on page load / once)
-  // but better: we schedule a long time window (e.g. 8 loops)
-  const loops = 10; // 10*4 chords*3.2s ≈ 128s
-  for(let k=0;k<loops;k++){
-    for(let i=0;i<prog.length;i++){
-      const ch = prog[i];
-      const at = base + (k*prog.length + i) * stepDur;
-
-      setPadChord(at, ch);
-
-      // melody notes inside this chord window
-      const root = chordRootMidi(ch);
-      for(let n=0;n<8;n++){
-        const note = root + 12 + melodySteps[n]; // 1 octave up
-        const t = at + 0.25 + n*(stepDur/8);
-        pluckNote(midiToHz(note), t, 0.22 + Math.random()*0.08);
-      }
-
-      // tiny sparkle at chord change
-      pluckNote(midiToHz(root + 24), at + 0.12, 0.18);
+  // 循環播放約 2 分鐘
+  let current = t0 + 0.2;
+  for(let loop=0; loop<12; loop++){
+    for(let i=0;i<melody.length;i++){
+      playNote(melody[i], current);
+      current += noteDur + gap;
     }
   }
 
-  ambientNodes = { out, padOscs, padGains };
+  ambientNodes = { master, vibrato };
   ambientOn = true;
-
-  // 如果你已經把右上角音符按鈕刪了，這行可以留著也沒關係；沒有元素就別用它
-  const icon = document.getElementById("audioIcon");
-  if(icon) icon.textContent = "♫";
 }
 
   function stopAmbient(){
