@@ -889,65 +889,190 @@
     }
   }
 
- function startAmbient(){
+  function startAmbient(){
   ensureAudio();
   if(audioCtx.state === "suspended") audioCtx.resume();
   if(ambientOn) return;
 
   const t0 = now();
 
+  // master + your light reverb-ish (if you still have makeReverbLikeGain)
   const master = audioCtx.createGain();
   master.gain.setValueAtTime(0.0001, t0);
-  master.gain.exponentialRampToValueAtTime(0.22, t0 + 1.2);
-  master.connect(audioCtx.destination);
+  master.gain.exponentialRampToValueAtTime(0.22, t0 + 1.2); // 總音量：想更大 0.26，想更小 0.18
 
-  // 小顫音（讓它更日系）
+  const rev = makeReverbLikeGain();
+  master.connect(rev.input);
+  rev.out.connect(audioCtx.destination);
+
+  // subtle vibrato (J-pop / anime feel)
   const vibrato = audioCtx.createOscillator();
-  vibrato.frequency.value = 5.5; // 顫音速度
-  const vibratoGain = audioCtx.createGain();
-  vibratoGain.gain.value = 8; // 顫音幅度
-  vibrato.connect(vibratoGain);
+  vibrato.type = "sine";
+  vibrato.frequency.value = 5.8;
+
+  const vibGain = audioCtx.createGain();
+  vibGain.gain.value = 9; // 顫音幅度：想更甜 11，想更穩 6
+  vibrato.connect(vibGain);
   vibrato.start();
 
   const midiToHz = (m) => 440 * Math.pow(2, (m - 69)/12);
 
-  // 日系夢幻旋律（C大調偏少女動畫）
-  const melody = [
-    72, 74, 76, 79,
-    76, 74, 72, 74,
-    76, 79, 81, 79,
-    76, 74, 72
-  ];
+  // --- Instrument: Music-box lead (sine + tiny bell overtone) ---
+  function playMusicBox(midi, at, dur=0.45, amp=0.095){
+    const f = midiToHz(midi);
 
-  const noteDur = 0.42;
-  const gap = 0.05;
+    // main
+    const o1 = audioCtx.createOscillator();
+    o1.type = "sine";
+    o1.frequency.setValueAtTime(f, at);
+    vibGain.connect(o1.frequency);
 
-  function playNote(midi, atTime){
-    const osc = audioCtx.createOscillator();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(midiToHz(midi), atTime);
+    // bell overtone (adds sparkle)
+    const o2 = audioCtx.createOscillator();
+    o2.type = "sine";
+    o2.frequency.setValueAtTime(f * 2.01, at);
+    vibGain.connect(o2.frequency);
 
-    // 加顫音
-    vibratoGain.connect(osc.frequency);
+    // gentle highpass to keep it crisp
+    const hp = audioCtx.createBiquadFilter();
+    hp.type = "highpass";
+    hp.frequency.value = 220;
 
-    const gain = audioCtx.createGain();
-    gain.gain.setValueAtTime(0.0001, atTime);
-    gain.gain.exponentialRampToValueAtTime(0.08, atTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.0001, atTime + noteDur);
+    // tiny bandpass "music box" color
+    const bp = audioCtx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 1400;
+    bp.Q.value = 7;
 
-    osc.connect(gain);
-    gain.connect(master);
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(amp, at + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
 
-    osc.start(atTime);
-    osc.stop(atTime + noteDur + 0.02);
+    o1.connect(bp);
+    o2.connect(bp);
+    bp.connect(hp);
+    hp.connect(g);
+    g.connect(master);
+
+    o1.start(at);
+    o2.start(at);
+    o1.stop(at + dur + 0.03);
+    o2.stop(at + dur + 0.03);
   }
 
-  // 循環播放約 2 分鐘
-  let current = t0 + 0.2;
-  for(let loop=0; loop<12; loop++){
-    for(let i=0;i<melody.length;i++){
-      playNote(melody[i], current);
-      current += noteDur + gap;
+  // --- Instrument: Soft arpeggio (triangle, warm) ---
+  function playArp(midi, at, dur=0.28, amp=0.05){
+    const f = midiToHz(midi);
+    const o = audioCtx.createOscillator();
+    o.type = "triangle";
+    o.frequency.setValueAtTime(f, at);
+
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 1200;
+
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(amp, at + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+
+    o.connect(lp);
+    lp.connect(g);
+    g.connect(master);
+
+    o.start(at);
+    o.stop(at + dur + 0.03);
+  }
+
+  // --- Instrument: Soft bass (sine, very gentle) ---
+  function playBass(midi, at, dur=0.8, amp=0.045){
+    const f = midiToHz(midi);
+    const o = audioCtx.createOscillator();
+    o.type = "sine";
+    o.frequency.setValueAtTime(f, at);
+
+    const lp = audioCtx.createBiquadFilter();
+    lp.type = "lowpass";
+    lp.frequency.value = 280;
+
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.exponentialRampToValueAtTime(amp, at + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+
+    o.connect(lp);
+    lp.connect(g);
+    g.connect(master);
+
+    o.start(at);
+    o.stop(at + dur + 0.04);
+  }
+
+  // ===== Harmony (C -> Am -> F -> G) =====
+  const chords = [
+    { name:"C",  chord:[60,64,67], bass:48 }, // C E G
+    { name:"Am", chord:[57,60,64], bass:45 }, // A C E
+    { name:"F",  chord:[53,57,60], bass:41 }, // F A C
+    { name:"G",  chord:[55,59,62], bass:43 }, // G B D
+  ];
+  const bar = 3.2;      // 每個和弦長度
+  const step = bar/8;   // 8 分音符
+
+  // ===== “華麗主旋律” (anime-ish / mermaid-fairytale) =====
+  // 用分段（每個和弦 8 個音）串成一個長旋律，然後循環
+  // 音域偏高，像主題曲
+  const melodyByChord = {
+    "C":  [76,79,81,79, 76,74,72,74],
+    "Am": [76,79,83,81, 79,76,74,72],
+    "F":  [74,77,81,79, 77,74,72,74],
+    "G":  [74,79,83,81, 79,77,76,74],
+  };
+
+  // Arp patterns (supporting glitter)
+  const arpByChord = {
+    "C":  [60,64,67,72, 67,64,60,64],
+    "Am": [57,60,64,69, 64,60,57,60],
+    "F":  [53,57,60,65, 60,57,53,57],
+    "G":  [55,59,62,67, 62,59,55,59],
+  };
+
+  // schedule for ~2 minutes
+  const loops = 10;
+  let cur = t0 + 0.15;
+
+  for(let k=0;k<loops;k++){
+    for(let i=0;i<chords.length;i++){
+      const ch = chords[i];
+      const name = ch.name;
+
+      // bass at chord start
+      playBass(ch.bass, cur + 0.00, 1.05, 0.05);
+
+      // arpeggio across bar
+      const arp = arpByChord[name];
+      for(let n=0;n<8;n++){
+        playArp(arp[n], cur + n*step + 0.02, 0.26, 0.05);
+      }
+
+      // main melody (music box)
+      const mel = melodyByChord[name];
+      for(let n=0;n<8;n++){
+        // make some notes longer for "華麗" phrasing
+        const long = (n === 2 || n === 6);
+        playMusicBox(
+          mel[n],
+          cur + n*step + 0.01,
+          long ? 0.55 : 0.42,
+          long ? 0.115 : 0.095
+        );
+        // little sparkle octave on strong beats
+        if(n === 0 || n === 4){
+          playMusicBox(mel[n] + 12, cur + n*step + 0.03, 0.25, 0.055);
+        }
+      }
+
+      cur += bar;
     }
   }
 
